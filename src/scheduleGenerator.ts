@@ -7,13 +7,13 @@ export default class Scheduler {
         this.startDate = moment('2016-03-12 05:00:00');
         this.currentTime = moment(moment('2016-03-12 05:00:00'));
         this.miliSecond = 1 / 60;
-        this.arrivals = [];        
+        this.arrivals = [];
     }
 
     start() {
         this.addAllDestinations();
         // this.displayData();
-        
+
         setInterval(() => {
             this.currentTime = moment(this.currentTime).add(1, 'minutes');
             this.addArrivals();
@@ -53,12 +53,18 @@ export default class Scheduler {
     displayData() {
         let ul = document.getElementById("arrivalList");
         ul.innerHTML = "";
+        let orderNumber = 1;
         this.arrivals.forEach(arrival => {
             if (arrival.arrivalTime.diff(this.currentTime) / 60000 <= 15) {
                 let li = document.createElement("li");
                 li.className = "list-group-item";
-                li.appendChild(document.createTextNode(arrival.toString(this.currentTime)));
+
+
+                li.appendChild(arrival.toSpan(orderNumber.toString(), this.currentTime));
                 ul.appendChild(li);
+
+                // li.appendChild(document.createTextNode(orderNumber + " " + arrival.toString(this.currentTime)));
+                orderNumber++;
             }
 
         });
@@ -69,6 +75,7 @@ export default class Scheduler {
     }
 
 
+    //todo: Strategy pattern might be overegnineering
     private addArrivals() {
         let currentTime = this.currentTime;
         let arrivals = this.arrivals;
@@ -86,8 +93,8 @@ export default class Scheduler {
 
         if (minute % 12 === 0) {
             let from = moment(currentTime).hours(6).minutes(36);
-            let to = moment(currentTime).add(1, 'day').hours(21).minutes(36);
-            this.tryAddDate("Nort Square", from, to, 24);
+            let to = moment(currentTime).hours(21).minutes(36);
+            this.tryAddDate("North Square", from, to, 24);
         }
 
         if (minute % 6 === 0) {
@@ -104,7 +111,7 @@ export default class Scheduler {
     }
 
     private tryAddDate(station: string, fromDate: moment.Moment, toDate: moment.Moment, addMinutes: number) {
-        if (this.currentTime.isBetween(fromDate, toDate))
+        if (this.currentTime.isSameOrAfter(fromDate) && this.currentTime.isSameOrBefore(toDate))
             this.arrivals.push(new Arrival(station, moment(this.currentTime).add(addMinutes, 'minutes')))
     }
 
@@ -116,12 +123,6 @@ export default class Scheduler {
         this.arrivals.push(new Arrival("Circular", moment(currentTime)));
         this.arrivals.push(new Arrival("Circular", moment(currentTime).add(1, 'hour')));
     }
-
-
-    //  setInterval(() => {
-    //     console.log("hello from scheduler");
-    // }, 600);
-
 }
 
 
