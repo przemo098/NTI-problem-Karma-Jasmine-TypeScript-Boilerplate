@@ -17,3 +17,6 @@ npm start
 npm test
 ```
 
+
+
+[## Live example](https://jsfiddle.net/przemo098/e0uaux7n/)
